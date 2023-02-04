@@ -9,6 +9,7 @@ import {
 import axios from "axios";
 
 import { API_ENDPOINT } from "../config";
+import { useNavigate, useSearchParams } from "react-router-dom";
 
 interface IPokemonsContext {
   loading: boolean;
@@ -27,14 +28,24 @@ const PokemonsContext = createContext<IPokemonsContext>({
   handlePagination: () => {},
 });
 
-export const PokemonsProvider: FC<{ children: ReactElement }> = ({
+export const PokemonsProvider: FC<{ children: ReactElement[] }> = ({
   children,
 }) => {
+  const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
   const [pokemons, setPokemons] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [nextPage, setNextPage] = useState<string | null>("offset=0&limit=6");
-  const [prevPage, setPrevPage] = useState<string | null>(null);
+  const [nextPage, setNextPage] = useState<string | null>(
+    `offset=${searchParams.get("offset") ?? 0}&limit=${
+      searchParams.get("limit") ?? 500
+    }`
+  );
+  const [prevPage, setPrevPage] = useState<string | null>(
+    `offset=${searchParams.get("offset") ?? 0}&limit=${
+      searchParams.get("limit") ?? 500
+    }`
+  );
 
   const handlePagination = (isNext = true) => {
     fetchPokemons(isNext);
@@ -48,6 +59,11 @@ export const PokemonsProvider: FC<{ children: ReactElement }> = ({
         if (response.status === 200) {
           const nextParams = response.data.next;
           const previousParams = response.data.previous;
+
+          navigate({
+            pathname: "/",
+            search: isNext && nextParams ? `?${nextPage}` : `?${prevPage}`,
+          });
 
           if (nextParams) {
             setNextPage(nextParams.replace(`${API_ENDPOINT}?`, ""));
