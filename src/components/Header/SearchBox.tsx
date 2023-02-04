@@ -6,12 +6,32 @@ import IconButton from "@mui/material/IconButton";
 
 const SearchBox = () => {
   return (
-    <FormControl size="small" variant="standard" sx={() => ({})}>
+    <FormControl
+      size="small"
+      sx={(theme) => ({
+        width: {
+          xs: 175,
+          md: "auto",
+        },
+        backgroundColor: "rgba(255,255,255, .25)",
+        borderRadius: 1,
+        "& .MuiOutlinedInput-notchedOutline": {
+          borderWidth: 0,
+        },
+      })}
+    >
       <OutlinedInput
         placeholder="Search..."
+        sx={(theme) => ({
+          color: theme.palette.grey[200],
+        })}
         startAdornment={
           <InputAdornment position="start">
-            <IconButton>
+            <IconButton
+              sx={(theme) => ({
+                color: theme.palette.grey[300],
+              })}
+            >
               <SearchIcon />
             </IconButton>
           </InputAdornment>
