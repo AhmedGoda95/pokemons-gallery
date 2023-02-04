@@ -1,7 +1,7 @@
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 
-import Header from "../components/Header";
 import Layout from "../components/Layout";
+import NotFound from "../pages/NotFound";
 import Pokemons from "../pages/Pokemons/List";
 import PokemonDetails from "../pages/Pokemons/PokemonDetails";
 
@@ -18,7 +18,6 @@ const router = createBrowserRouter([
     path: "/pokemon/:pokemonId",
     element: (
       <Layout>
-        <Header />
         <PokemonDetails />
       </Layout>
     ),
@@ -27,8 +26,7 @@ const router = createBrowserRouter([
     path: "*",
     element: (
       <Layout>
-        <Header />
-        <>Errorrrrrrrrrrrrrs</>
+        <NotFound />
       </Layout>
     ),
   },
