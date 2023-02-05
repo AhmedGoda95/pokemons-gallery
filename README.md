@@ -10,7 +10,7 @@ Installation:
 
 To Start Server: 
 
-`yarn dev` or `npm run dev`
+`npm run dev`
 
 To Start Server:
 
