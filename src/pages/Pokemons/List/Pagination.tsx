@@ -4,7 +4,7 @@ import CustomButton from "../../../components/CustomButton";
 import { usePokemons } from "../../../context/pokemonsContext";
 
 const Pagination = () => {
-  const { nextPage, prevPage, handlePagination } = usePokemons();
+  const { disabledNextBtn, disabledPrevBtn, handlePagination } = usePokemons();
 
   return (
     <Box
@@ -17,12 +17,12 @@ const Pagination = () => {
       <CustomButton
         handleClick={() => handlePagination(false)}
         title="Previous"
-        disabled={prevPage === null}
+        disabled={disabledPrevBtn}
       />
       <CustomButton
         handleClick={handlePagination}
         title="Next"
-        disabled={nextPage === null}
+        disabled={disabledNextBtn}
       />
     </Box>
   );

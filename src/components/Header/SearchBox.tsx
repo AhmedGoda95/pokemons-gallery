@@ -3,12 +3,19 @@ import SearchIcon from "@mui/icons-material/Search";
 import FormControl from "@mui/material/FormControl";
 import OutlinedInput from "@mui/material/OutlinedInput";
 import IconButton from "@mui/material/IconButton";
+import { usePokemons } from "../../context/pokemonsContext";
 
 const SearchBox = () => {
+  const { searchPokemons } = usePokemons();
+
+  const handleChange = (e: any) => {
+    searchPokemons(e.target.value);
+  };
+
   return (
     <FormControl
       size="small"
-      sx={(theme) => ({
+      sx={{
         width: {
           xs: 175,
           md: "auto",
@@ -18,13 +25,14 @@ const SearchBox = () => {
         "& .MuiOutlinedInput-notchedOutline": {
           borderWidth: 0,
         },
-      })}
+      }}
     >
       <OutlinedInput
         placeholder="Search..."
         sx={(theme) => ({
           color: theme.palette.grey[200],
         })}
+        onChange={handleChange}
         startAdornment={
           <InputAdornment position="start">
             <IconButton
