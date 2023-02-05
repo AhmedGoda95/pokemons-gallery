@@ -50,6 +50,7 @@ export const PokemonsProvider: FC<{ children: ReactElement[] }> = ({
   const [error, setError] = useState("");
   const [disabledNextBtn, setDisabledNextBtn] = useState(false);
   const [disabledPrevBtn, setDisabledPrevBtn] = useState(false);
+  const [progress, setProgress] = useState(0);
 
   const [nextUrl, setNextUrl] = useState<string>("");
   const [prevUrl, setPrevUrl] = useState<string>("");
@@ -58,11 +59,17 @@ export const PokemonsProvider: FC<{ children: ReactElement[] }> = ({
     fetchPokemons(isNext ? nextUrl : prevUrl);
   };
 
+  const options = {
+    onDownloadProgress: (e: any) => {
+      setProgress(Math.floor((e.loaded / e.total) * 100));
+    },
+  };
+
   const fetchPokemons = useCallback(
     (api = `${API_ENDPOINT}?${searchParams.toString()}`) => {
       setLoading(true);
       axios
-        .get(api)
+        .get(api, options)
         .then((response) => {
           if (response.status === 200) {
             setNextUrl(response.data.next);
