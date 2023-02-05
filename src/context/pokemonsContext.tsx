@@ -59,17 +59,20 @@ export const PokemonsProvider: FC<{ children: ReactElement[] }> = ({
     fetchPokemons(isNext ? nextUrl : prevUrl);
   };
 
-  const options = {
-    onDownloadProgress: (e: any) => {
-      setProgress(Math.floor((e.loaded / e.total) * 100));
-    },
-  };
+  /**
+   * api i used dosen't contains content-length which represents total length of data
+   */
+  // const options = {
+  //   onDownloadProgress: (e: any) => {
+  //     setProgress(Math.floor((e.loaded / e.total) * 100));
+  //   },
+  // };
 
   const fetchPokemons = useCallback(
     (api = `${API_ENDPOINT}?${searchParams.toString()}`) => {
       setLoading(true);
       axios
-        .get(api, options)
+        .get(api) // here add options as a second argument
         .then((response) => {
           if (response.status === 200) {
             setNextUrl(response.data.next);
