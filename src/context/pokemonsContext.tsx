@@ -5,118 +5,112 @@ import {
   ReactElement,
   useEffect,
   useContext,
+  useCallback,
 } from "react";
 import axios from "axios";
+import { useSearchParams } from "react-router-dom";
 
 import { API_ENDPOINT } from "../config";
-import { useNavigate, useSearchParams } from "react-router-dom";
+
+interface IPokemons {
+  name: string;
+  url: string;
+}
 
 interface IPokemonsContext {
   loading: boolean;
-  pokemons: Record<string, any>[];
+  pokemons: IPokemons[];
   error: string;
-  nextPage: string | null;
-  prevPage: string | null;
+  disabledNextBtn: boolean;
+  disabledPrevBtn: boolean;
   handlePagination: (...args: any[]) => any;
+  searchPokemons: (...args: any[]) => any;
 }
+
 const PokemonsContext = createContext<IPokemonsContext>({
   loading: true,
   pokemons: [],
   error: "",
-  nextPage: null,
-  prevPage: null,
+  disabledNextBtn: false,
+  disabledPrevBtn: false,
   handlePagination: () => {},
+  searchPokemons: () => {},
 });
 
 export const PokemonsProvider: FC<{ children: ReactElement[] }> = ({
   children,
 }) => {
-  const [searchParams] = useSearchParams();
-  const navigate = useNavigate();
-  const [pokemons, setPokemons] = useState([]);
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  const [pokemons, setPokemons] = useState<IPokemons[]>([]);
+  const [pokemonsDefaultValues, setPokemonsDefaultValues] = useState<
+    IPokemons[]
+  >([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [nextPage, setNextPage] = useState<string | null>(
-    `offset=${searchParams.get("offset") ?? 0}&limit=${
-      searchParams.get("limit") ?? 6
-    }`
-  );
-  const [prevPage, setPrevPage] = useState<string | null>(
-    `offset=${searchParams.get("offset") ?? 0}&limit=${
-      searchParams.get("limit") ?? 500
-    }`
-  );
+  const [disabledNextBtn, setDisabledNextBtn] = useState(false);
+  const [disabledPrevBtn, setDisabledPrevBtn] = useState(false);
+  // const [progress, setProgress] = useState(0);
 
-  const [offset, setOffset] = useState<string>(
-    `offset=${searchParams.get("offset") ?? 0}`
-  );
-  const [limit, setLimit] = useState<string>(
-    `limit=${searchParams.get("limit") ?? 6}`
-  );
+  const [nextUrl, setNextUrl] = useState<string>("");
+  const [prevUrl, setPrevUrl] = useState<string>("");
 
   const handlePagination = (isNext = true) => {
-    fetchPokemons(isNext);
+    fetchPokemons(isNext ? nextUrl : prevUrl);
   };
 
-  const fetchPokemons = async (isNext = true) => {
-    setLoading(true);
-    axios
-      .get(`${API_ENDPOINT}?offset=${offset}&limit=${limit}`)
-      .then((response) => {
-        if (response.status === 200) {
-          const nextParams = response.data.next;
-          const previousParams = response.data.previous;
-          console.log(response);
-          // const prevURL = new URL(response.data.previous);
-          if (response.data.next) {
-            const nextURL = new URL(response.data.next);
-            const params = new URLSearchParams(nextURL.search);
-            // let limit = params.get("limit");
-            let offset = params.get("offset");
-            setOffset(offset!);
+  /**
+   * api i used dosen't contains content-length which represents total length of data
+   */
+  // const options = {
+  //   onDownloadProgress: (e: any) => {
+  //     setProgress(Math.floor((e.loaded / e.total) * 100));
+  //   },
+  // };
+
+  const fetchPokemons = useCallback(
+    (api = `${API_ENDPOINT}?${searchParams.toString()}`) => {
+      setLoading(true);
+      axios
+        .get(api) // here add options as a second argument
+        .then((response) => {
+          if (response.status === 200) {
+            setNextUrl(response.data.next);
+            setPrevUrl(response.data.previous);
+
+            setDisabledNextBtn(response.data.next === null);
+            setDisabledPrevBtn(response.data.previous === null);
+
+            const searchParams = api.split("?");
+            setSearchParams(searchParams[1]);
+
+            setPokemons(response.data.results);
+            setPokemonsDefaultValues(response.data.results);
           }
-          if (response.data.previous) {
-            const prevURL = new URL(response.data.previous);
-            const params = new URLSearchParams(prevURL.search);
-            // let limit = params.get("limit");
-            let offset = params.get("offset");
-            setOffset(offset!);
-          }
+          setError("");
+          setLoading(false);
+        })
+        .catch((ex: any) => {
+          setError(ex.message);
+          setLoading(false);
+        });
+    },
+    []
+  );
 
-          // const url = new URL(response.data.next);
-          // const params = new URLSearchParams(url.search);
-          // let name = params.get("limit");
-          // let offset = params.get("offset");
-          navigate({
-            pathname: "/",
-            search: `?offset=${offset}&limit=${limit}`,
-            // search: isNext && nextParams ? `?${nextPage}` : `?${prevPage}`,
-          });
-
-          // if (nextParams) {
-          //   setNextPage(nextParams.replace(`${API_ENDPOINT}?`, ""));
-          // } else {
-          //   setNextPage(null);
-          // }
-
-          // if (previousParams) {
-          //   setPrevPage(previousParams.replace(`${API_ENDPOINT}?`, ""));
-          // } else {
-          //   setPrevPage(null);
-          // }
-
-          setPokemons(response.data.results);
-        }
-        setError("");
-        setLoading(false);
-      })
-      .catch((ex: any) => {
-        setError(ex.message);
-        setLoading(false);
-      });
+  const searchPokemons = (name: string) => {
+    const clonedPokemons = structuredClone(pokemonsDefaultValues);
+    setPokemons(() =>
+      clonedPokemons.filter((pokemon: IPokemons) => pokemon.name.includes(name))
+    );
   };
 
   useEffect(() => {
+    if (!searchParams.get("offset") && !searchParams.get("limit")) {
+      searchParams.set("offset", "0");
+      searchParams.set("limit", "6");
+      setSearchParams(searchParams);
+    }
     fetchPokemons();
   }, []);
 
@@ -126,9 +120,10 @@ export const PokemonsProvider: FC<{ children: ReactElement[] }> = ({
         loading,
         pokemons,
         error,
-        nextPage,
-        prevPage,
+        disabledNextBtn,
+        disabledPrevBtn,
         handlePagination,
+        searchPokemons,
       }}
     >
       {children}
