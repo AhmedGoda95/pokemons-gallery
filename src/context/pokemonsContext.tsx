@@ -38,13 +38,20 @@ export const PokemonsProvider: FC<{ children: ReactElement[] }> = ({
   const [error, setError] = useState("");
   const [nextPage, setNextPage] = useState<string | null>(
     `offset=${searchParams.get("offset") ?? 0}&limit=${
-      searchParams.get("limit") ?? 500
+      searchParams.get("limit") ?? 6
     }`
   );
   const [prevPage, setPrevPage] = useState<string | null>(
     `offset=${searchParams.get("offset") ?? 0}&limit=${
       searchParams.get("limit") ?? 500
     }`
+  );
+
+  const [offset, setOffset] = useState<string>(
+    `offset=${searchParams.get("offset") ?? 0}`
+  );
+  const [limit, setLimit] = useState<string>(
+    `limit=${searchParams.get("limit") ?? 6}`
   );
 
   const handlePagination = (isNext = true) => {
@@ -54,28 +61,49 @@ export const PokemonsProvider: FC<{ children: ReactElement[] }> = ({
   const fetchPokemons = async (isNext = true) => {
     setLoading(true);
     axios
-      .get(`${API_ENDPOINT}?${isNext ? nextPage : prevPage}`)
+      .get(`${API_ENDPOINT}?offset=${offset}&limit=${limit}`)
       .then((response) => {
         if (response.status === 200) {
           const nextParams = response.data.next;
           const previousParams = response.data.previous;
+          console.log(response);
+          // const prevURL = new URL(response.data.previous);
+          if (response.data.next) {
+            const nextURL = new URL(response.data.next);
+            const params = new URLSearchParams(nextURL.search);
+            // let limit = params.get("limit");
+            let offset = params.get("offset");
+            setOffset(offset!);
+          }
+          if (response.data.previous) {
+            const prevURL = new URL(response.data.previous);
+            const params = new URLSearchParams(prevURL.search);
+            // let limit = params.get("limit");
+            let offset = params.get("offset");
+            setOffset(offset!);
+          }
 
+          // const url = new URL(response.data.next);
+          // const params = new URLSearchParams(url.search);
+          // let name = params.get("limit");
+          // let offset = params.get("offset");
           navigate({
             pathname: "/",
-            search: isNext && nextParams ? `?${nextPage}` : `?${prevPage}`,
+            search: `?offset=${offset}&limit=${limit}`,
+            // search: isNext && nextParams ? `?${nextPage}` : `?${prevPage}`,
           });
 
-          if (nextParams) {
-            setNextPage(nextParams.replace(`${API_ENDPOINT}?`, ""));
-          } else {
-            setNextPage(null);
-          }
+          // if (nextParams) {
+          //   setNextPage(nextParams.replace(`${API_ENDPOINT}?`, ""));
+          // } else {
+          //   setNextPage(null);
+          // }
 
-          if (previousParams) {
-            setPrevPage(previousParams.replace(`${API_ENDPOINT}?`, ""));
-          } else {
-            setPrevPage(null);
-          }
+          // if (previousParams) {
+          //   setPrevPage(previousParams.replace(`${API_ENDPOINT}?`, ""));
+          // } else {
+          //   setPrevPage(null);
+          // }
 
           setPokemons(response.data.results);
         }
