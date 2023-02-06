@@ -22,7 +22,7 @@ const SpecficationItem: FC<SpecficationItemProps> = ({
             sm: "1.25rem",
           },
           width: {
-            xs: 175,
+            xs: 125,
             sm: 200,
           },
           borderRight: `2px solid ${theme.palette.grey[500]}`,

@@ -44,8 +44,22 @@ const Specfications: FC<SpecficationsProps> = ({ stats, abilities, moves }) => {
           value={value}
           onChange={handleChange}
           aria-label="Pokemon specfications"
+          sx={(theme) => ({
+            "& .MuiButtonBase-root": {
+              fontSize: {
+                xs: ".875rem",
+                sm: "1.2rem",
+              },
+            },
+            "& .Mui-selected": {
+              color: "#007af2!important",
+            },
+            "& .MuiTabs-indicator": {
+              backgroundColor: "#007af2!important",
+            },
+          })}
         >
-          <Tab label="Stats" color="red" />
+          <Tab label="Stats" />
           <Tab label="Moves" />
           <Tab label="Abilities" />
         </Tabs>
