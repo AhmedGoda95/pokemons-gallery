@@ -1,6 +1,6 @@
 # Pokemons Gallery
 
-An application used to fetch data from [pokemon](https://pokeapi.co/) based on user preference, built with React, TypeScript and CSS.
+An application used to fetch data from (http://jsonplaceholder.typicode.com/) based on user preference, built with React, TypeScript and CSS.
 
 ## Installation and Setup Instructions
 
@@ -13,8 +13,8 @@ Installation:
 
 To Start Server:
 
-`npm run dev`
+`npm run dev` or `yarn dev`
 
 To Start Server:
 
-`http://localhost:5000`
+`http://localhost:5173/`
