@@ -1,6 +1,6 @@
 # Pokemons Gallery
 
-An application used to fetch data from (http://jsonplaceholder.typicode.com/) based on user preference, built with React and TypeScript and using vite to create project.
+An application used to fetch data from (https://pokeapi.co/api/v2/pokemon) based on user preference, built with React and TypeScript and using vite to create project.
 
 ## Installation and Setup Instructions
 
@@ -17,4 +17,4 @@ To Start Server:
 
 To Start Server:
 
-`http://localhost:5173/`
+`http://localhost:5000/`
