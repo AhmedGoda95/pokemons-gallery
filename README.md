@@ -1,6 +1,6 @@
 # Pokemons Gallery
 
-An application used to fetch data from (http://jsonplaceholder.typicode.com/) based on user preference, built with React, TypeScript and CSS.
+An application used to fetch data from (http://jsonplaceholder.typicode.com/) based on user preference, built with React and TypeScript and using vite to create project.
 
 ## Installation and Setup Instructions
 
